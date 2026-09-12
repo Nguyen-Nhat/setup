@@ -1,0 +1,31 @@
+[/]
+auto-hide-mouse=false
+background-image='/home/minhnhat/Pictures/lol/aurora_11.jpg'
+sidebar-on-right=false
+terminal-title-style='none'
+theme-variant='dark'
+warn-vte-config-issue=false
+window-style='borderless'
+
+[profiles/2b7c4080-0ddd-46c5-8f23-563fd3ba789d]
+background-color='#300A24'
+background-transparency-percent=3
+badge-color='#AC7EA8'
+badge-color-set=false
+badge-position='southeast'
+bold-color-set=false
+cursor-colors-set=false
+cursor-shape='block'
+default-size-columns=80
+dim-transparency-percent=23
+draw-margin=36
+font='JetBrainsMono Nerd Font 12'
+foreground-color='#FFFFFF'
+highlight-colors-set=false
+palette=['#2E3436', '#CC0000', '#4E9A06', '#C4A000', '#3465A4', '#75507B', '#06989A', '#D3D7CF', '#555753', '#EF2929', '#8AE234', '#FCE94F', '#729FCF', '#AD7FA8', '#34E2E2', '#EEEEEC']
+scroll-on-output=false
+terminal-bell='none'
+text-blink-mode='unfocused'
+use-system-font=false
+use-theme-colors=false
+visible-name='Default'

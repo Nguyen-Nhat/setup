@@ -1,0 +1,9 @@
+[user]
+	name = nhat.ntm
+	email = nhat.ntm@teko.vn
+
+# Push/pull over HTTPS to the internal GitLab using a personal access token.
+# Create a new token at https://git.teko.vn/-/user_settings/personal_access_tokens
+# and replace <GITLAB_TOKEN> below. Do NOT commit the real token anywhere.
+[url "https://oauth2:<GITLAB_TOKEN>@git.teko.vn"]
+	insteadOf = https://git.teko.vn

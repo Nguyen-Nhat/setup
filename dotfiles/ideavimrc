@@ -1,0 +1,3 @@
+command! gi :action GotoImplementation
+command! gd :action GotoDeclaration
+command! gu :action FindUsages
