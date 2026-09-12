@@ -46,9 +46,32 @@ Mọi file config cũ bị ghi đè đều được backup vào `~/.setup-backup
 | `scripts/04-neovim.sh` | Neovim (tarball vào `/opt/nvim-linux-x86_64`), copy config NvChad, `Lazy sync`, cài LSP qua Mason, prettier/prettierd |
 | `scripts/07-tilix.sh` | Nạp profile tilix (màu, font, ảnh nền, transparency) bằng `dconf load`, đặt tilix làm terminal mặc định |
 | `scripts/08-vietnamese.sh` | Bộ gõ tiếng Việt: ibus + Unikey (Telex, Unicode), chuyển EN↔VI bằng `Alt+Space` |
+| `scripts/09-claude-code.sh` | Claude Code CLI + marketplace/plugin `agent-skills` (addyosmani) |
 
-Thứ tự chạy mặc định là 00 → 01 → 02 → 03 → 05 → 06 → 04 → 07 → 08:
+Thứ tự chạy mặc định là 00 → 01 → 02 → 03 → 05 → 06 → 04 → 07 → 08 → 09:
 Neovim chạy **sau** dev-tools vì Mason/treesitter cần Node, Go và compiler.
+Claude Code chạy cuối cùng vì cần `npm` từ bước dev-tools.
+
+## Claude Code
+
+Bước `09-claude-code.sh` cài **CLI** qua npm, cấu hình git dùng https thay
+vì ssh cho github.com (`git config --global url."https://github.com/".insteadOf
+git@github.com:`, tránh lỗi clone khi máy mới chưa có SSH key), rồi thêm
+marketplace + cài plugin:
+
+```bash
+claude plugin marketplace add addyosmani/agent-skills
+claude plugin install agent-skills@addy-agent-skills
+```
+
+Script này **không** copy `~/.claude` (credentials, session, `settings.json`
+cá nhân) — thư mục đó chứa token đăng nhập nên bị loại khỏi repo (xem mục
+"Những thứ script KHÔNG làm" bên dưới). Sau khi cài, đăng nhập lại thủ công
+trên máy mới:
+
+```bash
+claude
+```
 
 ## Bộ gõ tiếng Việt
 
@@ -118,6 +141,7 @@ Nên cân nhắc thu hồi token cũ khi bỏ máy cũ.
 4. Mở `nvim` một lần, chờ Lazy/Mason chạy xong, kiểm tra `:checkhealth`.
 5. Trong tmux, bấm `prefix + I` nếu plugin chưa được cài.
 6. Bấm `Alt+Space` thử bộ gõ tiếng Việt (xem mục "Bộ gõ tiếng Việt" ở trên).
+7. Chạy `claude` và đăng nhập lại (xem mục "Claude Code" ở trên).
 
 ## Những thứ script KHÔNG làm
 

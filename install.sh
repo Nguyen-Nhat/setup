@@ -16,6 +16,7 @@ STEPS=(
   "04-neovim.sh:Neovim + NvChad config + LSP servers"
   "07-tilix.sh:Tilix profile, colors, font, wallpaper"
   "08-vietnamese.sh:Vietnamese input (ibus + Unikey, Telex, Alt+Space)"
+  "09-claude-code.sh:Claude Code CLI (npm install -g @anthropic-ai/claude-code)"
 )
 
 usage() {
@@ -85,4 +86,5 @@ Next steps
 3. Edit ~/.gitconfig and put in a fresh GitLab personal access token.
 4. Open nvim once and let Lazy/Mason finish; check :checkhealth.
 5. In tmux press prefix + I if the plugins were not installed.
+6. Run `claude` and log in again (credentials are not copied by this repo).
 NEXT
