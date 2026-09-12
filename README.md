@@ -45,9 +45,47 @@ Mọi file config cũ bị ghi đè đều được backup vào `~/.setup-backup
 | `scripts/06-infra-tools.sh` | Docker CE, kubectl/kubeadm/kubelet, helm, kubectx/kubens, k9s, Terraform |
 | `scripts/04-neovim.sh` | Neovim (tarball vào `/opt/nvim-linux-x86_64`), copy config NvChad, `Lazy sync`, cài LSP qua Mason, prettier/prettierd |
 | `scripts/07-tilix.sh` | Nạp profile tilix (màu, font, ảnh nền, transparency) bằng `dconf load`, đặt tilix làm terminal mặc định |
+| `scripts/08-vietnamese.sh` | Bộ gõ tiếng Việt: ibus + Unikey (Telex, Unicode), chuyển EN↔VI bằng `Alt+Space` |
 
-Thứ tự chạy mặc định là 00 → 01 → 02 → 03 → 05 → 06 → 04 → 07:
+Thứ tự chạy mặc định là 00 → 01 → 02 → 03 → 05 → 06 → 04 → 07 → 08:
 Neovim chạy **sau** dev-tools vì Mason/treesitter cần Node, Go và compiler.
+
+## Bộ gõ tiếng Việt
+
+Bước `08-vietnamese.sh` dựng lại đúng cấu hình hiện tại:
+
+- Cài `ibus` + `ibus-unikey` (kèm `ibus-gtk/gtk3/gtk4` để app GTK nhận bộ gõ).
+- Input sources: `[('xkb','us'), ('ibus','Unikey')]` — bàn phím US + Unikey.
+- Phím chuyển: `Alt+Space` (ngược lại `Shift+Alt+Space`).
+- Unikey: kiểu gõ **Telex**, bảng mã **Unicode**, bật kiểm tra chính tả,
+  tự khôi phục từ không hợp lệ, bỏ dấu tự do, `w` đứng một mình ra `ư`.
+- `per-window = false` — trạng thái bộ gõ dùng chung cho mọi cửa sổ.
+
+Script phải chạy **trong phiên đồ hoạ** (cần `gsettings`). Nếu chạy qua SSH
+hay TTY, nó sẽ cài gói rồi bỏ qua phần cấu hình và nhắc bạn chạy lại:
+
+```bash
+./install.sh 08
+```
+
+Mặc định không tạo locale `vi_VN.UTF-8` (máy cũ cũng không có, `LANG` vẫn là
+`en_US.UTF-8`). Nếu muốn có để format ngày/số kiểu Việt:
+
+```bash
+INSTALL_VI_LOCALE=1 ./scripts/08-vietnamese.sh
+```
+
+Kiểm tra sau khi cài: bấm `Alt+Space`, icon panel đổi sang **VN**, gõ
+`tieengs vieejt` → ra `tiếng việt`.
+
+Nếu app Electron (Slack, VS Code) hoặc JetBrains không nhận bộ gõ, đăng xuất
+đăng nhập lại; vẫn lỗi thì thêm vào `~/.profile`:
+
+```sh
+export GTK_IM_MODULE=ibus
+export QT_IM_MODULE=ibus
+export XMODIFIERS=@im=ibus
+```
 
 ## Config được mang theo
 
@@ -79,6 +117,7 @@ Nên cân nhắc thu hồi token cũ khi bỏ máy cũ.
 3. Sửa `~/.gitconfig`, điền token GitLab mới.
 4. Mở `nvim` một lần, chờ Lazy/Mason chạy xong, kiểm tra `:checkhealth`.
 5. Trong tmux, bấm `prefix + I` nếu plugin chưa được cài.
+6. Bấm `Alt+Space` thử bộ gõ tiếng Việt (xem mục "Bộ gõ tiếng Việt" ở trên).
 
 ## Những thứ script KHÔNG làm
 
@@ -86,7 +125,7 @@ Phần này cố ý để ngoài phạm vi, cài tay nếu cần:
 
 - Google Chrome, Slack, VLC, Lutris/Wine, JetBrains IDE (`~/apps/idea`)
 - Pritunl VPN client, cert trong `~/.cert`, kubeconfig trong `~/.kube`
+- Các gói `ibus-table-cangjie*` / `libpinyin` (bộ gõ tiếng Trung, cài kèm từ language support)
 - `~/workspace` (các repo) và `~/workspace/tekone.wt/wt` mà alias `wt` trỏ tới
-- Bộ gõ tiếng Việt (ibus-unikey) và các gói ibus-table
 - Cấu hình GNOME (phím tắt, tiling-assistant, monitors.xml)
 - Credential: `.aws`, `.docker`, `.npm`, `.gnupg`, `.claude`

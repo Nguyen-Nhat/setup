@@ -15,6 +15,7 @@ STEPS=(
   "06-infra-tools.sh:Docker, kubectl, helm, kubectx, k9s, terraform"
   "04-neovim.sh:Neovim + NvChad config + LSP servers"
   "07-tilix.sh:Tilix profile, colors, font, wallpaper"
+  "08-vietnamese.sh:Vietnamese input (ibus + Unikey, Telex, Alt+Space)"
 )
 
 usage() {
