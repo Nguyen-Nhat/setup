@@ -46,7 +46,7 @@ Mọi file config cũ bị ghi đè đều được backup vào `~/.setup-backup
 | `scripts/04-neovim.sh` | Neovim (tarball vào `/opt/nvim-linux-x86_64`), copy config NvChad, `Lazy sync`, cài LSP qua Mason, prettier/prettierd |
 | `scripts/07-tilix.sh` | Nạp profile tilix (màu, font, ảnh nền, transparency) bằng `dconf load`, đặt tilix làm terminal mặc định |
 | `scripts/08-vietnamese.sh` | Bộ gõ tiếng Việt: ibus + Unikey (Telex, Unicode), chuyển EN↔VI bằng `Alt+Space` |
-| `scripts/09-claude-code.sh` | Claude Code CLI + marketplace/plugin `agent-skills` (addyosmani) |
+| `scripts/09-claude-code.sh` | Claude Code CLI + marketplace/plugin `agent-skills` (addyosmani) + Vim input mode |
 | `scripts/10-aws-cli.sh` | AWS CLI v2 + scaffold `~/.aws/config` (region `ap-southeast-1`, `output=json`) và `~/.aws/credentials` (key rỗng) |
 
 Thứ tự chạy mặc định là 00 → 01 → 02 → 03 → 05 → 06 → 04 → 07 → 08 → 09 → 10:
@@ -64,6 +64,10 @@ marketplace + cài plugin:
 claude plugin marketplace add addyosmani/agent-skills
 claude plugin install agent-skills@addy-agent-skills
 ```
+
+Cuối cùng, script set `"editorMode": "vim"` trong `~/.claude/settings.json`
+(dùng `jq` để merge, không đụng các field khác) — tương đương chạy `/vim`
+trong Claude Code để bật Vim keybindings cho ô nhập prompt.
 
 Script này **không** copy `~/.claude` (credentials, session, `settings.json`
 cá nhân) — thư mục đó chứa token đăng nhập nên bị loại khỏi repo (xem mục
