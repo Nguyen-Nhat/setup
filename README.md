@@ -144,6 +144,7 @@ dotfiles/
 ├── tilix.dconf           → dconf /com/gexperts/Tilix/
 ├── aws/config            → ~/.aws/config   (region ap-southeast-1, json)
 ├── aws/credentials.template → ~/.aws/credentials  (phải tự điền key)
+├── goland/settings.zip   → GoLand: File → Manage IDE Settings → Import Settings
 └── wallpaper/aurora_11.jpg → ~/Pictures/lol/
 ```
 
@@ -169,6 +170,7 @@ Nên cân nhắc thu hồi token/key cũ khi bỏ máy cũ.
 6. Bấm `Alt+Space` thử bộ gõ tiếng Việt (xem mục "Bộ gõ tiếng Việt" ở trên).
 7. Chạy `claude` và đăng nhập lại (xem mục "Claude Code" ở trên).
 8. Điền `~/.aws/credentials` với access key/secret thật (xem mục "AWS CLI" ở trên).
+9. Mở GoLand → **File → Manage IDE Settings → Import Settings…** → chọn `dotfiles/goland/settings.zip` (keymap, template, font, theme...). Xuất lại bằng **Export Settings…** khi muốn cập nhật.
 
 ## Những thứ script KHÔNG làm
 
