@@ -47,10 +47,11 @@ Mọi file config cũ bị ghi đè đều được backup vào `~/.setup-backup
 | `scripts/07-tilix.sh` | Nạp profile tilix (màu, font, ảnh nền, transparency) bằng `dconf load`, đặt tilix làm terminal mặc định |
 | `scripts/08-vietnamese.sh` | Bộ gõ tiếng Việt: ibus + Unikey (Telex, Unicode), chuyển EN↔VI bằng `Alt+Space` |
 | `scripts/09-claude-code.sh` | Claude Code CLI + marketplace/plugin `agent-skills` (addyosmani) |
+| `scripts/10-aws-cli.sh` | AWS CLI v2 + scaffold `~/.aws/config` (region `ap-southeast-1`, `output=json`) và `~/.aws/credentials` (key rỗng) |
 
-Thứ tự chạy mặc định là 00 → 01 → 02 → 03 → 05 → 06 → 04 → 07 → 08 → 09:
+Thứ tự chạy mặc định là 00 → 01 → 02 → 03 → 05 → 06 → 04 → 07 → 08 → 09 → 10:
 Neovim chạy **sau** dev-tools vì Mason/treesitter cần Node, Go và compiler.
-Claude Code chạy cuối cùng vì cần `npm` từ bước dev-tools.
+Claude Code và AWS CLI chạy cuối vì không phụ thuộc các bước khác.
 
 ## Claude Code
 
@@ -71,6 +72,25 @@ trên máy mới:
 
 ```bash
 claude
+```
+
+## AWS CLI
+
+Bước `10-aws-cli.sh` cài AWS CLI v2 (tải thẳng từ `awscli.amazonaws.com`,
+không qua apt) rồi tạo:
+
+- `~/.aws/config` — từ `dotfiles/aws/config`, `region = ap-southeast-1`,
+  `output = json`. File này **không chứa bí mật** nên bị ghi đè mỗi lần
+  chạy lại nếu khác với template (bản cũ được backup như mọi dotfile khác).
+- `~/.aws/credentials` — từ `dotfiles/aws/credentials.template`, với
+  `aws_access_key_id` / `aws_secret_access_key` để **rỗng**. Chỉ tạo nếu
+  file chưa tồn tại — nếu đã có (tức bạn đã điền key), script **không**
+  đụng vào để tránh ghi đè mất key thật.
+
+Sau khi cài, tự điền access key/secret:
+
+```bash
+$EDITOR ~/.aws/credentials
 ```
 
 ## Bộ gõ tiếng Việt
@@ -122,6 +142,8 @@ dotfiles/
 ├── gitconfig.template    → ~/.gitconfig  (phải tự điền token)
 ├── nvim/                 → ~/.config/nvim/   (NvChad starter đã custom)
 ├── tilix.dconf           → dconf /com/gexperts/Tilix/
+├── aws/config            → ~/.aws/config   (region ap-southeast-1, json)
+├── aws/credentials.template → ~/.aws/credentials  (phải tự điền key)
 └── wallpaper/aurora_11.jpg → ~/Pictures/lol/
 ```
 
@@ -131,7 +153,11 @@ dotfiles/
 Token đó **không** được copy vào đây. Script cài `gitconfig.template`, bạn
 phải tự tạo token mới và điền vào chỗ `<GITLAB_TOKEN>`.
 
-Nên cân nhắc thu hồi token cũ khi bỏ máy cũ.
+Tương tự, `~/.aws/credentials` được tạo với `aws_access_key_id` /
+`aws_secret_access_key` **để rỗng** — không có key thật nào nằm trong repo.
+Bạn tự paste key vào sau khi cài.
+
+Nên cân nhắc thu hồi token/key cũ khi bỏ máy cũ.
 
 ## Sau khi cài xong
 
@@ -142,6 +168,7 @@ Nên cân nhắc thu hồi token cũ khi bỏ máy cũ.
 5. Trong tmux, bấm `prefix + I` nếu plugin chưa được cài.
 6. Bấm `Alt+Space` thử bộ gõ tiếng Việt (xem mục "Bộ gõ tiếng Việt" ở trên).
 7. Chạy `claude` và đăng nhập lại (xem mục "Claude Code" ở trên).
+8. Điền `~/.aws/credentials` với access key/secret thật (xem mục "AWS CLI" ở trên).
 
 ## Những thứ script KHÔNG làm
 
@@ -152,4 +179,6 @@ Phần này cố ý để ngoài phạm vi, cài tay nếu cần:
 - Các gói `ibus-table-cangjie*` / `libpinyin` (bộ gõ tiếng Trung, cài kèm từ language support)
 - `~/workspace` (các repo) và `~/workspace/tekone.wt/wt` mà alias `wt` trỏ tới
 - Cấu hình GNOME (phím tắt, tiling-assistant, monitors.xml)
-- Credential: `.aws`, `.docker`, `.npm`, `.gnupg`, `.claude`
+- Credential: `.docker`, `.npm`, `.gnupg`, `.claude` (key/token thật, không copy)
+- `~/.aws` chỉ được **scaffold** (config + credentials rỗng) bởi
+  `10-aws-cli.sh` — key thật vẫn phải tự điền, xem mục "AWS CLI" ở trên
