@@ -15,6 +15,10 @@ log "Copying the nvim config (without .git)"
 rsync -a --delete --exclude '.git' --exclude '.claude' \
   "$HOME/.config/nvim/" "$DOTFILES/nvim/" && ok "nvim"
 
+log "Copying claude-rr (without accounts data)"
+[ -d "$HOME/workspace/claude-rr" ] && rsync -a --delete --exclude '.git' --exclude '.idea' --exclude '__pycache__' \
+  "$HOME/workspace/claude-rr/" "$DOTFILES/claude-rr/" && ok "claude-rr"
+
 log "Dumping tilix settings"
 dconf dump /com/gexperts/Tilix/ > "$DOTFILES/tilix.dconf" && ok "tilix.dconf"
 

@@ -18,6 +18,7 @@ STEPS=(
   "08-vietnamese.sh:Vietnamese input (ibus + Unikey, Telex, Alt+Space)"
   "09-claude-code.sh:Claude Code CLI (npm install -g @anthropic-ai/claude-code)"
   "10-aws-cli.sh:AWS CLI v2 + ~/.aws/config,credentials scaffold"
+  "11-claude-rr.sh:claude-rr multi-account Claude Code switcher"
 )
 
 usage() {
@@ -89,4 +90,6 @@ Next steps
 5. In tmux press prefix + I if the plugins were not installed.
 6. Run `claude` and log in again (credentials are not copied by this repo).
 7. Edit ~/.aws/credentials and paste in the AWS access key/secret.
+8. Run `source ~/.zshrc`, then `claude-rr add <name>` for each Claude
+   account you want to use concurrently.
 NEXT

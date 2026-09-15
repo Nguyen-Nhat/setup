@@ -66,6 +66,9 @@ export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 alias wt='~/workspace/tekone.wt/wt'
 wtcd() { cd "$(wt path "$1")"; }
 
+alias claude-rr="~/workspace/claude-rr/claude-rr.sh"
+alias claude-usage="python3 ~/workspace/claude-rr/claude-usage.py"
+
 
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 

@@ -48,10 +48,12 @@ Mọi file config cũ bị ghi đè đều được backup vào `~/.setup-backup
 | `scripts/08-vietnamese.sh` | Bộ gõ tiếng Việt: ibus + Unikey (Telex, Unicode), chuyển EN↔VI bằng `Alt+Space` |
 | `scripts/09-claude-code.sh` | Claude Code CLI + marketplace/plugin `agent-skills` (addyosmani) + Vim input mode |
 | `scripts/10-aws-cli.sh` | AWS CLI v2 + scaffold `~/.aws/config` (region `ap-southeast-1`, `output=json`) và `~/.aws/credentials` (key rỗng) |
+| `scripts/11-claude-rr.sh` | `claude-rr` — chạy nhiều account Claude Code đồng thời (xem mục riêng bên dưới) |
 
-Thứ tự chạy mặc định là 00 → 01 → 02 → 03 → 05 → 06 → 04 → 07 → 08 → 09 → 10:
+Thứ tự chạy mặc định là 00 → 01 → 02 → 03 → 05 → 06 → 04 → 07 → 08 → 09 → 10 → 11:
 Neovim chạy **sau** dev-tools vì Mason/treesitter cần Node, Go và compiler.
-Claude Code và AWS CLI chạy cuối vì không phụ thuộc các bước khác.
+Claude Code, AWS CLI và claude-rr chạy cuối vì không phụ thuộc các bước khác
+(claude-rr chỉ cần `~/.zshrc` đã tồn tại, do `02-zsh.sh` tạo).
 
 ## Claude Code
 
@@ -96,6 +98,40 @@ Sau khi cài, tự điền access key/secret:
 ```bash
 $EDITOR ~/.aws/credentials
 ```
+
+## Claude Code multi-account (claude-rr)
+
+Bước `11-claude-rr.sh` copy `dotfiles/claude-rr/` sang `~/workspace/claude-rr/`,
+rồi chạy `init.sh` của nó để thêm 2 alias vào `~/.zshrc`:
+
+- `claude-rr` → `~/workspace/claude-rr/claude-rr.sh`
+- `claude-usage` → `python3 ~/workspace/claude-rr/claude-usage.py`
+
+`claude-rr` cho phép chạy **nhiều account Claude Code cùng lúc**: mỗi
+account có `CLAUDE_CONFIG_DIR` riêng (`.claude.json`, `.credentials.json`),
+nhưng dùng chung `projects/` (symlink) nên `--resume` thấy session của mọi
+account, `settings.json`/`plugins`/`history.jsonl` cũng dùng chung.
+
+```bash
+source ~/.zshrc               # nạp alias vừa thêm
+
+claude-rr add work            # mở `claude auth login` cho account này
+claude-rr add personal
+
+claude-rr run work            # chạy song song ở 2 terminal khác nhau — an toàn
+claude-rr run personal --resume
+
+claude-rr list
+claude-rr usage                # xem usage mọi account, không đụng state
+claude-rr next                 # tự chọn account còn nhiều quota nhất
+claude-rr next --resume
+claude-rr remove personal      # xoá account (có xác nhận)
+```
+
+Script này **không** tạo account nào và không copy `~/.claude-accounts/`
+(nơi lưu credentials thật của từng account) — tương tự lý do `.claude` bị
+loại khỏi repo ở bước Claude Code, mỗi account phải đăng nhập tay trên máy
+mới. Chi tiết đầy đủ: `dotfiles/claude-rr/README.md`.
 
 ## Bộ gõ tiếng Việt
 
@@ -149,7 +185,8 @@ dotfiles/
 ├── aws/config            → ~/.aws/config   (region ap-southeast-1, json)
 ├── aws/credentials.template → ~/.aws/credentials  (phải tự điền key)
 ├── goland/settings.zip   → GoLand: File → Manage IDE Settings → Import Settings
-└── wallpaper/aurora_11.jpg → ~/Pictures/lol/
+├── wallpaper/aurora_11.jpg → ~/Pictures/lol/
+└── claude-rr/            → ~/workspace/claude-rr/   (claude-rr.sh, claude-usage.py, init.sh)
 ```
 
 ## Lưu ý về bảo mật
@@ -175,6 +212,7 @@ Nên cân nhắc thu hồi token/key cũ khi bỏ máy cũ.
 7. Chạy `claude` và đăng nhập lại (xem mục "Claude Code" ở trên).
 8. Điền `~/.aws/credentials` với access key/secret thật (xem mục "AWS CLI" ở trên).
 9. Mở GoLand → **File → Manage IDE Settings → Import Settings…** → chọn `dotfiles/goland/settings.zip` (keymap, template, font, theme...). Xuất lại bằng **Export Settings…** khi muốn cập nhật.
+10. `source ~/.zshrc` rồi `claude-rr add <name>` cho mỗi account Claude Code muốn dùng đồng thời (xem mục "Claude Code multi-account (claude-rr)" ở trên).
 
 ## Những thứ script KHÔNG làm
 
@@ -188,3 +226,6 @@ Phần này cố ý để ngoài phạm vi, cài tay nếu cần:
 - Credential: `.docker`, `.npm`, `.gnupg`, `.claude` (key/token thật, không copy)
 - `~/.aws` chỉ được **scaffold** (config + credentials rỗng) bởi
   `10-aws-cli.sh` — key thật vẫn phải tự điền, xem mục "AWS CLI" ở trên
+- `~/.claude-accounts/` (credentials thật của từng account claude-rr) —
+  cùng lý do với `.claude`, không copy; mỗi account phải `claude-rr add`
+  và đăng nhập tay trên máy mới
