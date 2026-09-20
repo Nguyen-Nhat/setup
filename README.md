@@ -49,11 +49,12 @@ Mọi file config cũ bị ghi đè đều được backup vào `~/.setup-backup
 | `scripts/09-claude-code.sh` | Claude Code CLI + marketplace/plugin `agent-skills` (addyosmani) + Vim input mode |
 | `scripts/10-aws-cli.sh` | AWS CLI v2 + scaffold `~/.aws/config` (region `ap-southeast-1`, `output=json`) và `~/.aws/credentials` (key rỗng) |
 | `scripts/11-claude-rr.sh` | `claude-rr` — chạy nhiều account Claude Code đồng thời (xem mục riêng bên dưới) |
+| `scripts/12-protoc.sh` | protoc (protobuf) `3.13.0` build từ source (xem mục riêng bên dưới) |
 
-Thứ tự chạy mặc định là 00 → 01 → 02 → 03 → 05 → 06 → 04 → 07 → 08 → 09 → 10 → 11:
+Thứ tự chạy mặc định là 00 → 01 → 02 → 03 → 05 → 06 → 04 → 07 → 08 → 09 → 10 → 11 → 12:
 Neovim chạy **sau** dev-tools vì Mason/treesitter cần Node, Go và compiler.
-Claude Code, AWS CLI và claude-rr chạy cuối vì không phụ thuộc các bước khác
-(claude-rr chỉ cần `~/.zshrc` đã tồn tại, do `02-zsh.sh` tạo).
+Claude Code, AWS CLI, claude-rr và protoc chạy cuối vì không phụ thuộc các
+bước khác (claude-rr chỉ cần `~/.zshrc` đã tồn tại, do `02-zsh.sh` tạo).
 
 ## Claude Code
 
@@ -132,6 +133,27 @@ Script này **không** tạo account nào và không copy `~/.claude-accounts/`
 (nơi lưu credentials thật của từng account) — tương tự lý do `.claude` bị
 loại khỏi repo ở bước Claude Code, mỗi account phải đăng nhập tay trên máy
 mới. Chi tiết đầy đủ: `dotfiles/claude-rr/README.md`.
+
+## protoc (protobuf)
+
+Bước `scripts/12-protoc.sh` build `protoc` **3.13.0 từ source** — bản apt/snap
+không có đúng version này. Các bước (đúng như quy trình chuẩn của protobuf):
+
+```bash
+sudo apt-get install autoconf automake libtool curl make g++ unzip
+wget https://github.com/protocolbuffers/protobuf/releases/download/v3.13.0/protobuf-all-3.13.0.tar.gz
+tar -xvzf protobuf-all-3.13.0.tar.gz
+cd protobuf-3.13.0/
+./configure
+make
+sudo make install
+sudo ldconfig
+```
+
+Script tải/giải nén/build trong một thư mục tạm (`mktemp -d`) và **xoá sạch**
+thư mục đó (tarball + source đã build) sau khi `make install` xong, kể cả khi
+có lỗi giữa chừng — không để lại rác trong `$HOME`. Nếu `protoc --version`
+đã khớp `libprotoc 3.13.0`, script bỏ qua toàn bộ (idempotent).
 
 ## Bộ gõ tiếng Việt
 

@@ -19,6 +19,7 @@ STEPS=(
   "09-claude-code.sh:Claude Code CLI (npm install -g @anthropic-ai/claude-code)"
   "10-aws-cli.sh:AWS CLI v2 + ~/.aws/config,credentials scaffold"
   "11-claude-rr.sh:claude-rr multi-account Claude Code switcher"
+  "12-protoc.sh:protoc (protobuf) 3.13.0, built from source"
 )
 
 usage() {

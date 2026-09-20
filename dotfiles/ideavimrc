@@ -1,3 +1,8 @@
 command! gi :action GotoImplementation
 command! gd :action GotoDeclaration
 command! gu :action FindUsages
+
+" Ctrl+C/Ctrl+V luôn do IDE xử lý (copy/paste), không để Vim nuốt mất —
+" tránh phải nhờ vào lựa chọn "shortcut conflict" lưu cục bộ theo từng máy.
+sethandler <C-c> a:ide
+sethandler <C-v> a:ide

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import json
 import os
 import re
 import sys
@@ -11,9 +12,47 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 MAX_PARALLEL_CHECKS = 8
 
 BASE_DIR = os.path.expanduser("~/.claude-accounts")
+HOME_DIR = os.path.expanduser("~")
+
+ANSI_ESCAPE = re.compile(r"\x1B(?:\[[0-?]*[ -/]*[@-~]|\][^\x07\x1b]*(?:\x07|\x1b\\))")
+
+
+def ensure_trust(config_dir):
+    path = os.path.join(config_dir, ".claude.json")
+    if not os.path.isfile(path):
+        return
+    try:
+        with open(path) as f:
+            data = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return
+
+    projects = data.setdefault("projects", {})
+    entry = projects.get(HOME_DIR, {})
+    if entry.get("hasTrustDialogAccepted"):
+        return
+
+    projects[HOME_DIR] = {
+        "allowedTools": [],
+        "mcpContextUris": [],
+        "mcpServers": {},
+        "enabledMcpjsonServers": [],
+        "disabledMcpjsonServers": [],
+        "hasClaudeMdExternalIncludesApproved": False,
+        "hasClaudeMdExternalIncludesWarningShown": False,
+        **entry,
+        "hasTrustDialogAccepted": True,
+    }
+    try:
+        with open(path, "w") as f:
+            json.dump(data, f, indent=2)
+    except OSError:
+        pass
 
 
 def get_usage(config_dir):
+    ensure_trust(config_dir)
+
     master_fd, slave_fd = pty.openpty()
     env = os.environ.copy()
     env["TERM"] = "xterm-256color"
@@ -25,7 +64,7 @@ def get_usage(config_dir):
         stdout=slave_fd,
         stderr=slave_fd,
         env=env,
-        cwd=os.path.expanduser("~"),
+        cwd=HOME_DIR,
         close_fds=True,
     )
     os.close(slave_fd)
@@ -69,8 +108,7 @@ def get_usage(config_dir):
 
 
 def parse_usage(output):
-    ansi_escape = re.compile(r"\x1B\[[0-?]*[ -/]*[@-~]")
-    text = ansi_escape.sub("", output)
+    text = ANSI_ESCAPE.sub("", output)
 
     result = {"session": None, "week": None}
 
