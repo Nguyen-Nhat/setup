@@ -172,7 +172,7 @@ def main():
     accounts = list_accounts()
 
     if not accounts:
-        print("[ERROR] No accounts found. Run: claude-rr add <name>")
+        print("No accounts found. Run: claude-rr add <name>", file=sys.stderr)
         return
 
     results = check_all(accounts)
@@ -195,7 +195,7 @@ def main():
 def pick_least_used():
     accounts = list_accounts()
     if not accounts:
-        print("[ERROR] No accounts found. Run: claude-rr add <name>", file=sys.stderr)
+        print("No accounts found. Run: claude-rr add <name>", file=sys.stderr)
         sys.exit(1)
 
     print(f"Checking {len(accounts)} account(s)", file=sys.stderr)
@@ -218,7 +218,7 @@ def pick_least_used():
             best_name, best_percent = name, percent
 
     if best_name is None:
-        print("[ERROR] No account has usable session data.", file=sys.stderr)
+        print("No account has usable session data.", file=sys.stderr)
         sys.exit(1)
 
     print(f"[OK] Picked '{best_name}' ({best_percent}% session used)", file=sys.stderr)

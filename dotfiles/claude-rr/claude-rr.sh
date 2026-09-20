@@ -5,12 +5,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BASE_DIR="$HOME/.claude-accounts"
 SHARED_DIR="$BASE_DIR/_shared"
 
-SHARED_ITEMS=(projects settings.json plugins shell-snapshots history.jsonl session-env)
+SHARED_ITEMS=(projects settings.json plugins shell-snapshots history.jsonl session-env file-history)
 
 account_dir() { echo "$BASE_DIR/$1"; }
 
 ensure_shared() {
-    mkdir -p "$SHARED_DIR/projects" "$SHARED_DIR/plugins" "$SHARED_DIR/shell-snapshots" "$SHARED_DIR/session-env"
+    mkdir -p "$SHARED_DIR/projects" "$SHARED_DIR/plugins" "$SHARED_DIR/shell-snapshots" "$SHARED_DIR/session-env" "$SHARED_DIR/file-history"
     [ -f "$SHARED_DIR/settings.json" ] || echo '{}' > "$SHARED_DIR/settings.json"
     [ -f "$SHARED_DIR/history.jsonl" ] || : > "$SHARED_DIR/history.jsonl"
 }
@@ -32,7 +32,7 @@ link_shared() {
 cmd_add() {
     local name="$1"
     local dir; dir="$(account_dir "$name")"
-    [ -e "$dir" ] && { echo "[ERROR] Account '$name' already exists at $dir"; exit 1; }
+    [ -e "$dir" ] && { echo "Account '$name' already exists at $dir" >&2; exit 1; }
     ensure_shared
     mkdir -p "$dir"
     link_shared "$dir"
@@ -44,27 +44,27 @@ cmd_add() {
 cmd_run() {
     local name="$1"; shift
     local dir; dir="$(account_dir "$name")"
-    [ -d "$dir" ] || { echo "[ERROR] Account '$name' not found. Run: claude-rr add $name"; exit 1; }
+    [ -d "$dir" ] || { echo "Account '$name' not found." >&2; exit 1; }
     exec env CLAUDE_CONFIG_DIR="$dir" claude "$@"
 }
 
 cmd_login() {
     local name="$1"
     local dir; dir="$(account_dir "$name")"
-    [ -d "$dir" ] || { echo "[ERROR] Account '$name' not found. Run: claude-rr add $name"; exit 1; }
+    [ -d "$dir" ] || { echo "Account '$name' not found." >&2; exit 1; }
     CLAUDE_CONFIG_DIR="$dir" claude auth login
 }
 
 cmd_status() {
     local name="$1"
     local dir; dir="$(account_dir "$name")"
-    [ -d "$dir" ] || { echo "[ERROR] Account '$name' not found."; exit 1; }
+    [ -d "$dir" ] || { echo "Account '$name' not found." >&2; exit 1; }
     CLAUDE_CONFIG_DIR="$dir" claude auth status
 }
 
 cmd_list() {
-    [ -d "$BASE_DIR" ] || { echo "No accounts yet. Run: claude-rr add <name>"; return; }
-    echo "Accounts (concurrent mode, base: $BASE_DIR):"
+    [ -d "$BASE_DIR" ] || { echo "No accounts yet."; return; }
+    echo "Accounts:"
     for f in "$BASE_DIR"/*/; do
         [ -d "$f" ] || continue
         name="$(basename "$f")"
@@ -80,9 +80,9 @@ cmd_path() {
 cmd_remove() {
     local name="$1"; local force="${2:-}"
     local dir; dir="$(account_dir "$name")"
-    [ -d "$dir" ] || { echo "[ERROR] Account '$name' not found."; exit 1; }
+    [ -d "$dir" ] || { echo "Account '$name' not found." >&2; exit 1; }
 
-    if [ "$force" != "-y" ] && [ "$force" != "--force" ]; then
+    if [ "$force" != "-y" ]; then
         read -r -p "Remove account '$name' at $dir? This permanently deletes its login/credentials. [y/N] " reply
         case "$reply" in
             [yY][eE][sS]|[yY]) ;;
@@ -113,7 +113,7 @@ case "${1:-}" in
     path)   [ -z "${2:-}" ] && { echo "Usage: $0 path <name>"; exit 1; }; cmd_path "$2" ;;
     usage)  cmd_usage ;;
     next)   shift; cmd_next "$@" ;;
-    remove) [ -z "${2:-}" ] && { echo "Usage: $0 remove <name> [-y|--force]"; exit 1; }; cmd_remove "$2" "${3:-}" ;;
+    remove) [ -z "${2:-}" ] && { echo "Usage: $0 remove <name> [-y]"; exit 1; }; cmd_remove "$2" "${3:-}" ;;
     ""|help|-h|--help)
         cat <<EOF
 Usage: $0 <command>
@@ -130,9 +130,9 @@ Commands:
   next [args...] Pick the account with the most session headroom (lowest
                  % used) and run it. No args starts a fresh session;
                  'claude-rr next --resume' (or -r) resumes on that account.
-  remove <name> [-y|--force]
+  remove <name> [-y]
                  Permanently delete an account (asks to confirm unless
-                 -y/--force is passed)
+                 -y is passed)
 
 Sessions (projects/) are shared automatically between all accounts, so
 'claude-rr run <other> --resume' can pick up a session started under
@@ -140,5 +140,5 @@ any account. 'claude-rr next' automates that account choice for you.
 EOF
         ;;
     *)
-        echo "[ERROR] Unknown command: $1"; exit 1 ;;
+        echo "Unknown command: $1" >&2; exit 1 ;;
 esac
